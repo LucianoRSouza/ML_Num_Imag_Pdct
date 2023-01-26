@@ -65,5 +65,7 @@ new_model= tf.keras.models.load_model("epic_num_reader.model")
 prediction = new_model.predict([X_test])
 print(np.argmax(prediction[0]))
 
+# this will return to you only the number, but you can visualize the image with this below:
+
 plt.imshow(X_test[0])
 plt.show()
