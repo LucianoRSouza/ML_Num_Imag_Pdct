@@ -1,0 +1,69 @@
+# First you need to pip install matplotlib and tensorflow at your terminal.
+# Then import it:
+
+import matplotlib.pyplot as plt
+import tensorflow as tf
+
+# Here below we are extracting the mnist images of numbers digits from 1 to 10, which is basic data into Keras for DeepL.
+mnist = tf.keras.datasets.mnist
+
+# Here we will unpack these images:
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+# Here we will create our model and the Sequential model is a go-to standard for NN, after that you can use other models,
+# and compare the results:
+# we´ll flatten the layers because we want it as a layer, since the original is a 28x28 image, when you have a convolutional 
+# Neural Network a lot of times at the end of it, there will be just like a densely connected layer, and so you need to 
+# flatten it before that layer, so it´s used for more than the input layer. 
+# this flattened layer is our input layer, now below that we´re adding our hidden layers (this is the deep learning, we´ll add 2), and 
+# but instead of flatten we´ll use dense layers, then the parameters will be 128 inits/neurons and the activation, which could
+# be stepper, signmoid etc... we´ll use for this exemple relu. We
+# the last one is the the output layer, and the output layer in case of classifications it has to have the numbers of classification
+# you have in your case, which in this case is 10, the 10 images of number digits. 
+
+model= tf.keras.models.Sequential()
+model.add(tf.keras.layers.Flatten())
+model.add(tf.keras.layers.Dense(128, activation= tf.nn.relu))
+model.add(tf.keras.layers.Dense(128, activation= tf.nn.relu))
+model.add(tf.keras.layers.Dense(10, activation= tf.nn.softmax))
+
+# Now let´s train our model but before we need to set these parameters:
+# We´ll use compile and will use adam optimizer, which is the most common and go-to to such a ML program, loss is really
+# important and there are many ways to do it, but we´ll use sparse categorical crossentropy for this exemple, and for the
+# metric we want "accuracy".
+model.compile(
+    optimizer= "adam",
+    loss= "sparse_categorical_crossentropy",
+    metrics= ["accuracy"]
+)
+
+# Now after the parameters, we train our model with the operation fit, then you write it and run the program. It´ll 
+# surprise you with really good results, as neural networks is great at fitting, but did it overfit it? Our hope is to
+# have the model actually generalized, learned the paterns, not simply memorized every single sample you passed.
+
+model.fit(X_train, y_train, epochs=5)
+
+# So, we always want to calculate the validation loss and accuracy, it´s quite simple, just use the model.evaluate and pass
+# the x_test and y_test and it´ll return 2 variables which we´ll name val_loss and val_acc respectivaly. 
+
+val_loss, val_acc = model.evaluate(X_test, y_test)
+
+# then we simply print them and compare their results with the results we got from our model, if the difference is too big
+# then it´s overfit and we need to recheck some parameters. 
+
+print(val_loss, val_acc)
+
+# now if you want to save this program:
+
+model.save("epic_num_reader.model")
+
+# now if you want to rerun the program:
+
+import numpy as np
+
+new_model= tf.keras.models.load_model("epic_num_reader.model")
+prediction = new_model.predict([X_test])
+print(np.argmax(prediction[0]))
+
+plt.imshow(X_test[0])
+plt.show()
